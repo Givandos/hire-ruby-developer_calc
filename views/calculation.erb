@@ -114,13 +114,13 @@
       </div>
     </form>
 
-    <% unless @errors.nil? %>
+    <% unless @errors.nil? || @errors.empty? %>
       <div class="errors">
         <%= @errors.join("<br />") %>
       </div>
     <% end %>
 
-    <% unless @result.nil? %>
+    <% unless @result.nil? || @result.empty? %>
       <div class="results">
         <table>
           <thead>

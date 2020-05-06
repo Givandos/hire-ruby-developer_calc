@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "./helpers/helpers"
 require "./deposit_calculation/validation"
 
 # calculation of deposit
@@ -10,16 +11,14 @@ class Calculation
     raise ArgumentError, "params is required" if params.nil? || params.empty?
 
     @params = params.transform_keys!(&:to_sym)
-
-    validation = Validation.new(params).perform
-
-    @errors = validation.errors
+    @errors = []
     @result = []
     @amount = params[:amount].to_f
     @deposited_interest = 0
   end
 
   def perform
+    validate
     calculate if @errors.empty?
 
     self
@@ -28,6 +27,11 @@ class Calculation
   private
 
   attr_reader :amount, :deposited_interest
+
+  def validate
+    validation = Validation.new(params).perform
+    @errors = validation.errors
+  end
 
   def calculate
     date = Date.parse(params[:start_date])
