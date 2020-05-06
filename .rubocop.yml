@@ -1,0 +1,8 @@
+AllCops:
+  Exclude:
+    - "bin/bundle"
+    - "bin/setup"
+    - "Rakefile"
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes

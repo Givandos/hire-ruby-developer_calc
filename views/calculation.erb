@@ -1,0 +1,166 @@
+<html>
+<head>
+  <title>Calc 1.0</title>
+  <style>
+    html, body, form {
+      margin: 0;
+      padding: 0;
+    }
+    .calc {
+      padding: 1rem;
+      background: #e0e0e0;
+    }
+    .head_of_form {
+      font-size: 1.5rem;
+      padding-left: calc(200px + 2rem);
+    }
+    .part_of_form {
+      border-top: #666 solid 1px;
+      padding-top: .5rem;
+      margin-top: .5rem;
+    }
+    label {
+      display: block;
+      float: left;
+      width: 200px;
+      padding-right: 2rem;
+    }
+    button {
+      margin-left: calc(200px + 2rem);
+      cursor: pointer;
+    }
+    button:hover {
+      background: #eafaea;
+    }
+    .errors {
+      padding: 1rem;
+      color: #ff0000;
+      background: #f8f8f8;
+    }
+    .results {
+      background: #f8f8f8;
+    }
+    .results table {
+      width: 100%;
+    }
+    .results th, .results td {
+      padding: .5rem 1rem;
+      border-bottom: #e0e0e0 solid 1px;
+      text-align: center;
+    }
+    .results th {
+      background: #d0e6fc;
+    }
+    .results td:nth-child(n+4) {
+      text-align: right;
+    }
+    .results tr:nth-child(even) td {
+      background: #e5e4e4;
+    }
+    .results tfoot td {
+      border-top: #2b2b2b solid 1px;
+      background: #e5e4e4;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <form action="/" class="calc" method="post">
+      <div>
+        <div class="head_of_form">Main information</div>
+        <div class="part_of_form">
+          <label for="currency">Currency</label>
+          <select id=currency name="currency">
+            <option value="uah"<%= " selected" if @params[:currency] == "uah" %>>UAH</option>
+            <option value="usd"<%= " selected" if @params[:currency] == "usd" %>>USD</option>
+            <option value="eur"<%= " selected" if @params[:currency] == "eur" %>>EUR</option>
+          </select>
+        </div>
+        <div class="part_of_form">
+          <label for="amount">Amount of deposit</label>
+          <input type="text" name="amount" id="amount" value="<%= @params[:amount] %>" />
+        </div>
+        <div class="part_of_form">
+          <label for="rate">Annual rate</label>
+          <input type="text" name="rate" id="rate" value="<%= @params[:rate] %>" />%
+        </div>
+        <div class="part_of_form">
+          <label for="start_date">Date of deposit start</label>
+          <input type="text" name="start_date" id="start_date" value="<%= @params[:start_date] %>" />
+        </div>
+        <div class="part_of_form">
+          <label for="deposit_duration">Duration of deposit</label>
+          <input type="text" name="deposit_duration" id="deposit_duration" value="<%= @params[:deposit_duration] %>" />
+          <select name="duration_period" id="duration_period">
+            <option value="month"<%= " selected" if @params[:duration_period] == "month" %>>Month</option>
+            <option value="year"<%= " selected" if @params[:duration_period] == "year" %>>Year</option>
+          </select>
+        </div>
+
+        <div class="part_of_form">
+          <label for="capital">Capitalization</label>
+          <select id=capital name="capital">
+            <option value="nothing"<%= " selected" if @params[:capital] == "nothing" %>>nothing</option>
+            <option value="monthly"<%= " selected" if @params[:capital] == "monthly" %>>Monthly</option>
+            <option value="quarterly"<%= " selected" if @params[:capital] == "quarterly" %>>Quarterly</option>
+            <option value="yearly"<%= " selected" if @params[:capital] == "yearly" %>>Yearly</option>
+          </select>
+        </div>
+
+        <div class="part_of_form">
+          <button>Calculate</button>
+        </div>
+      </div>
+    </form>
+
+    <% unless @errors.nil? %>
+      <div class="errors">
+        <%= @errors.join("<br />") %>
+      </div>
+    <% end %>
+
+    <% unless @result.nil? %>
+      <div class="results">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Days</th>
+              <th>Amount of body</th>
+              <th>Replenish</th>
+              <th>Withdraw</th>
+              <th>% on deposit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @result.map do |res| %>
+              <tr>
+                <td><%= res[:index] %></td>
+                <td><%= res[:date].strftime("%d.%m.%Y") %></td>
+                <td><%= res[:days_counter] %></td>
+                <td><%= res[:amount] %></td>
+                <td><%= res[:replenish] %></td>
+                <td><%= res[:withdraw] %></td>
+                <td><%= res[:interest].round(2) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td>
+              <td>Total:</td>
+              <td><%= @result.sum { |h| h[:days_counter].to_i } %></td>
+              <td><%= @result.last[:amount] %></td>
+              <td></td>
+              <td></td>
+              <td><%= @result.sum { |h| h[:interest].to_f }.round(2) %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</body>
+</html>
